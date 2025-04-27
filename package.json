@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "mailgen": "^2.0.29",
+    "nodemailer": "^6.10.1"
+  }
+}
