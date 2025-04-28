@@ -8,7 +8,8 @@ export const userRegistrationValidator = () => {
             .isEmail().withMessage("Invalid Email"),
         body("name")
             .trim()
-            .notEmpty().withMessage("Name is required"),
+            .notEmpty().withMessage("Name is required")
+            .isLength({ min: 3 }).withMessage("username should be atleast of 3 char"),
         body("password")
             .trim()
             .notEmpty().withMessage("Password is required")
@@ -32,7 +33,7 @@ export const userLoginValidator = () => {
             .isEmail().withMessage("Email is not valid"),
         body("password")
             .trim()
-            .isEmpty().withMessage("Password is required"),
+            .notEmpty().withMessage("Password is required"),
     ];
 }
 
@@ -40,7 +41,7 @@ export const resetPasswordValidator = () => {
     return [
         body("password")
             .trim()
-            .isEmpty().withMessage("Password is required")
+            .notEmpty().withMessage("Password is required")
             .isStrongPassword({
                 minLength: 6,
                 minLowercase: 1,
@@ -55,7 +56,7 @@ export const changePasswordValidator = () => {
     return [
         body("new_password")
             .trim()
-            .isEmpty().withMessage("Password is required")
+            .notEmpty().withMessage("Password is required")
             .isStrongPassword({
                 minLength: 6,
                 minLowercase: 1,
@@ -65,6 +66,6 @@ export const changePasswordValidator = () => {
             }).withMessage("Please set a strong password"),
         body("password")
             .trim()
-            .isEmpty().withMessage("Password is required")
+            .notEmpty().withMessage("Password is required")
     ]
 }

@@ -57,7 +57,6 @@ const generateAccessAndRefereshTokens = async (userId) => {
 const register = asyncHandler(async (req, res) => {
     const { name, email, image, password } = req.body;
 
-    //validation => express validator
     //image => multer
 
     //check for existing user
@@ -100,7 +99,8 @@ const register = asyncHandler(async (req, res) => {
     });
 
     //send it through mail
-    const emailVerificationUrl = `${process.env.BASE_URL}/api/v1/user/verify/${emailVerificationToken}`
+    const emailVerificationUrl = `${process.env.BASE_URL}:${process.env.PORT}/api/v1/verify/${emailVerificationToken}`
+
     const mailOptions = {
         email: user.email,
         subject: "LeetX Email Verification",
@@ -147,8 +147,7 @@ const login = asyncHandler(async (req, res) => {
     //save the token in cookie
     const cookieOptions = {
         httpOnly: true,
-        secure: true,
-        maxAge: 1000 * 60 * 60 * 24 * 10 //10 days
+        secure: true
     }
 
     return res
@@ -261,7 +260,7 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
 
     //generate reset password url
     const token = cryto.randomBytes(32).toString("hex");
-    const resetPasswordUrl = `${process.env.BASE_URL}/api/v1/user/forgot-password/${token}`
+    const resetPasswordUrl = `${process.env.BASE_URL}:${process.env.PORT}/api/v1/reset-password/${token}`
 
     //save it in db
     const updated_user = await db.user.update({
@@ -352,11 +351,11 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
     //get refresh token
-    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
-    if(!refreshToken) throw new ApiError(401, "unauthorized request");
+    const oldRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+    if(!oldRefreshToken) throw new ApiError(401, "unauthorized request");
 
     // get payload from token
-    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decodedToken = jwt.verify(oldRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
     //check if user exists
     const user = await db.user.findUnique({
@@ -367,12 +366,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     //check if refresh token is expired 
-    if(refreshToken !== user.refreshToken){
+    if(oldRefreshToken !== user.refreshToken){
         throw new ApiError(401, "Refresh token is expired or used");
     }
 
     //get new accesstoken, refresh token 
-    const {accessToken, newRefreshToken} = await generateAccessAndRefereshTokens(user.id);
+    const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user.id);
 
     // save it in cookies
     const cookieOptions = {
@@ -383,8 +382,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     return res
            .status(200)
            .cookie("accessToken",accessToken, cookieOptions)
-           .cookie("refreshToken",newRefreshToken, cookieOptions)
-           .json(new ApiResponse(200, {accessToken, refreshToken: newRefreshToken}, "Access token refreshed"))
+           .cookie("refreshToken",refreshToken, cookieOptions)
+           .json(new ApiResponse(200, {accessToken, refreshToken}, "Access token refreshed"))
 })
 
 
