@@ -6,7 +6,8 @@ export const validate = (req, res, next) => {
     console.log(errors);
 
     if(errors.isEmpty()){
-        return next();
+        // return next();
+        next();
     }
 
     const extractedErrors = [];
