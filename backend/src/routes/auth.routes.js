@@ -13,7 +13,7 @@ import {
     logoutUser, 
     refreshAccessToken, 
     registerUser,
-    resetForgottenPassword,
+    resetForgottenPassword, 
     verifyEmail
 } from "../controllers/auth.controller.js" 
 import { validate } from "../middlewares/validator.middleware.js";

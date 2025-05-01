@@ -29,7 +29,7 @@ export const isAdmin = async (req, res, next) => {
             select: {role: true}
         });
 
-        if(user.role !== "ADMIN"){
+        if(!user || user.role !== "ADMIN"){
             throw next(new ApiError(401, "You are not authorized"));
         }
 
