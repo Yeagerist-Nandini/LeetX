@@ -19,14 +19,27 @@ export const submitBatch = async (submissions, res) => {
     }
 }
 
-export const getLanguageId =(language) => {
+export const getLanguageId = (language) => {
     const languages = {
         "JAVA": 62,
         "PYTHON": 70,
-        "C++" : 52
+        "C++" : 52,
+        "JavaScript": 63
     }
 
     return languages[language.toUpperCase()];
+}
+
+
+export const getLanguage = (language_id) => {
+    const LANGUAGE_NAMES = {
+        52: "C++",
+        63: "JavaScript",
+        71: "Python",
+        62: "Java",
+    }
+
+    return LANGUAGE_NAMES[language_id] || "Unknown"
 }
 
 
