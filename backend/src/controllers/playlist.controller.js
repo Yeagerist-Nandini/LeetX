@@ -1,10 +1,10 @@
 import { db } from "../utils/db.js";
-import asyncHanlder from "../utils/asyncHandler.js"
+import {asyncHandler} from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js"
 
 
-export const createPlaylist = asyncHanlder(async (req, res) => {
+export const createPlaylist = asyncHandler(async (req, res) => {
     const { name, description } = req.body;
     const userId = req.user.id;
 
@@ -24,7 +24,7 @@ export const createPlaylist = asyncHanlder(async (req, res) => {
 })
 
 
-export const getAllPlaylists = asyncHanlder(async (req, res) => {
+export const getAllPlaylists = asyncHandler(async (req, res) => {
     const playlists = await db.playlist.findMany({
         where: {
             userId: req.user.id
@@ -48,7 +48,7 @@ export const getAllPlaylists = asyncHanlder(async (req, res) => {
 })
 
 
-export const getPlaylistById = asyncHanlder(async (req, res) => {
+export const getPlaylistById = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
 
     const playlist = await db.playlist.findUnique({
@@ -70,7 +70,7 @@ export const getPlaylistById = asyncHanlder(async (req, res) => {
 })
 
 
-export const addProblemToPlaylist = asyncHanlder(async (req, res) => {
+export const addProblemToPlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
     const { problemIds } = req.body;
 
@@ -93,7 +93,7 @@ export const addProblemToPlaylist = asyncHanlder(async (req, res) => {
 })
 
 
-export const deletePlaylist = asyncHanlder(async (req, res) => {
+export const deletePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
 
     const deleted_playlist = await db.playlist.delete({
@@ -109,7 +109,7 @@ export const deletePlaylist = asyncHanlder(async (req, res) => {
 })
 
 
-export const removeProblemFromPlatlist = asyncHanlder(async (req, res) => {
+export const removeProblemFromPlatlist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params;
     const {problemIds} = req.body;
 

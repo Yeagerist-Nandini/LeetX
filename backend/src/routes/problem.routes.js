@@ -4,15 +4,15 @@ import { createProblem, deleteProblem, getAllProblems, getAllProblemsSolvedByUse
 
 const router = express.Router();
 
-router.post("/problems", isLoggedIn, isAdmin, createProblem);
+router.post("/create-problem", isLoggedIn, isAdmin, createProblem);
 
-router.get("/problems", isLoggedIn, getAllProblems);
+router.get("/", isLoggedIn, getAllProblems);
 
-router.get("/problems/:id", isLoggedIn, getProblemById);
+router.get("/:problemId", isLoggedIn, getProblemById);
 
-router.put("/problems/:id",isLoggedIn, isAdmin, updateProblem);
+router.put("/:problemId",isLoggedIn, updateProblem);
 
-router.delete("/problems/:id", isLoggedIn, isAdmin, deleteProblem);
+router.delete("/:problemId", isLoggedIn, isAdmin, deleteProblem);
 
 router.get("/get-solved-problems", isLoggedIn, getAllProblemsSolvedByUser);
 

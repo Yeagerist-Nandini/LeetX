@@ -24,7 +24,7 @@ export const getLanguageId = (language) => {
         "JAVA": 62,
         "PYTHON": 70,
         "C++" : 52,
-        "JavaScript": 63
+        "JAVASCRIPT": 63
     }
 
     return languages[language.toUpperCase()];
@@ -34,9 +34,9 @@ export const getLanguageId = (language) => {
 export const getLanguage = (language_id) => {
     const LANGUAGE_NAMES = {
         52: "C++",
-        63: "JavaScript",
-        71: "Python",
-        62: "Java",
+        63: "JAVASCRIPT",
+        71: "PYTHON",
+        62: "JAVA",
     }
 
     return LANGUAGE_NAMES[language_id] || "Unknown"
@@ -55,8 +55,9 @@ export const pollBatchResults = async (tokens) => {
         })
 
         const results = data.submissions;
+        console.log(results);
 
-        const isAllDone = results.every((result) => result.status!==2 && result.status!==1);
+        const isAllDone = results.every((result) => result.status.id!==2 && result.status.id!==1);
 
         if(isAllDone) return results;
         await sleep(1000);

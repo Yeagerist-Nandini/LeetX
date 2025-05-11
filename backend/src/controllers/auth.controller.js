@@ -1,6 +1,6 @@
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
-import { asyncHandler, AsyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import cryto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -55,7 +55,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
 
 const register = asyncHandler(async (req, res) => {
-    const { name, email, image, password } = req.body;
+    const { name, email, image, password, role } = req.body;
 
     //image => multer
 
@@ -79,7 +79,7 @@ const register = asyncHandler(async (req, res) => {
             password: hashedPassword,
             name,
             image,
-            role: UserRole.USER
+            role: role? role : UserRole.USER
         }
     })
     if (!user) {
@@ -88,7 +88,8 @@ const register = asyncHandler(async (req, res) => {
 
     //generate verification token 
     const emailVerificationToken = cryto.randomBytes(32).toString('hex');
-    const emailVerificationExpiry = Date.now() + (20 * 60 * 1000);
+    const emailVerificationExpiry = new Date(Date.now() + (20 * 60 * 1000));
+
 
     user = await db.user.update({
         where: { id: user.id },
@@ -99,7 +100,7 @@ const register = asyncHandler(async (req, res) => {
     });
 
     //send it through mail
-    const emailVerificationUrl = `${process.env.BASE_URL}:${process.env.PORT}/api/v1/verify/${emailVerificationToken}`
+    const emailVerificationUrl = `${process.env.BASE_URL}:${process.env.PORT}/api/v1/auth/verify/${emailVerificationToken}`
 
     const mailOptions = {
         email: user.email,
@@ -129,7 +130,7 @@ const login = asyncHandler(async (req, res) => {
 
     //check password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const isPasswordMatching = await bcrypt.compare(user.password, hashedPassword)
+    const isPasswordMatching = await bcrypt.compare(password, user.password)
 
     //check if password is matching
     if (!isPasswordMatching) {
@@ -183,10 +184,10 @@ const verifyEmail = asyncHandler(async (req, res) => {
     const { token } = req.params;
 
     //check if token is valid
-    const user = await db.user.findUnique({
+    const user = await db.user.findFirst({
         where: {
             emailVerificationToken: token,
-            emailVerificationExpriy: { gt: Date.now() }
+            emailVerificationExpiry: { gt: new Date(Date.now()) }
         }
     })
 

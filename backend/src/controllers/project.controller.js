@@ -1,10 +1,10 @@
 import { db } from "../utils/db.js";
 import { submitBatch, getLanguageId, pollBatchResults } from "../utils/judge0.js";
-import asyncHanlder from "../utils/asyncHandler.js"
+import {asyncHandler} from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js"
 
-export const createProblem = asyncHanlder(async (req, res) => {
+export const createProblem = asyncHandler(async (req, res) => {
     const {
         title,
         description,
@@ -72,7 +72,7 @@ export const createProblem = asyncHanlder(async (req, res) => {
 })
 
 
-export const getAllProblems = asyncHanlder(async (req, res) => {
+export const getAllProblems = asyncHandler(async (req, res) => {
     const problems = await db.problem.findMany();
 
     if (!problems) throw new ApiError(404, "No problems found");
@@ -83,7 +83,7 @@ export const getAllProblems = asyncHanlder(async (req, res) => {
 })
 
 
-export const getProblemById = asyncHanlder(async (req, res) => {
+export const getProblemById = asyncHandler(async (req, res) => {
     const { problemId } = req.params;
 
     const problem = await db.problem.findUnique({
@@ -98,7 +98,7 @@ export const getProblemById = asyncHanlder(async (req, res) => {
 })
 
 
-export const updateProblem = asyncHanlder(async (req, res) => {
+export const updateProblem = asyncHandler(async (req, res) => {
     const { problemId } = req.params;
 
     const problem = await db.problem.findUnique({ where: { id: problemId } });
@@ -116,14 +116,15 @@ export const updateProblem = asyncHanlder(async (req, res) => {
         referenceSolutions
     } = req.body;
 
-    for(const [language, solutionCode] in Object.entries(referenceSolutions)){
+    for(const [language, solutionCode] of Object.entries(referenceSolutions)){
         const languageId = getLanguageId(language);
+        console.log(languageId, language);
 
         if (!languageId) throw new ApiError(400, `Language ${language} is not supported`);
 
         const submissions =  testcases.map(({input, output}) => ({
             source_code: solutionCode,
-            sdtin: input,
+            stdin: input,
             expected_output: output, 
             language_id: languageId
         }));
@@ -133,11 +134,14 @@ export const updateProblem = asyncHanlder(async (req, res) => {
         const tokens = submissionResults.map((result) => result.token);
 
         const results = await pollBatchResults(tokens);
+        // console.log(results)
 
-        for(let i=0;i<results.length;i++){
+        for(let i=0;i<results.length;i++){ 
             const result = results[i];
 
-            if(result.status!==3) throw new ApiError(400, `Testcase ${i + 1} failed for ${language}`);
+            console.log(`Testcase ${i + 1}  for ${language}`, result);
+
+            if(result.status.id!==3) throw new ApiError(400, `Testcase ${i + 1} failed for ${language}`);
         }
     }
 
@@ -162,7 +166,7 @@ export const updateProblem = asyncHanlder(async (req, res) => {
 })
 
 
-export const deleteProblem = asyncHanlder(async (req, res) => {
+export const deleteProblem = asyncHandler(async (req, res) => {
     const { problemId } = req.params;
 
     const problem = await db.problem.findUnique({
@@ -179,6 +183,6 @@ export const deleteProblem = asyncHanlder(async (req, res) => {
 })
 
 
-export const getAllProblemsSolvedByUser = asyncHanlder(async (req, res) => {
+export const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
 
 })

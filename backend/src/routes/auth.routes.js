@@ -9,26 +9,26 @@ import {
     changeCurrentPassword,
     forgotPasswordRequest,
     getCurrentUser,
-    loginUser, 
-    logoutUser, 
-    refreshAccessToken, 
-    registerUser,
-    resetForgottenPassword, 
-    verifyEmail
+    login,
+    logout,
+    refreshAccessToken,
+    register,
+    resetForgottenPassword,
+    verifyEmail,
 } from "../controllers/auth.controller.js" 
-import { validate } from "../middlewares/validator.middleware.js";
-import {isLoggedIn} from '../middlewares/auth.middleware.js';
+import { validate } from "../middleware/validate.middleware.js";
+import {isLoggedIn} from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.post("/register", userRegistrationValidator(), validate, registerUser);
+router.post("/register", userRegistrationValidator(), validate, register);
   
-router.post("/login", userLoginValidator(), validate, loginUser);
+router.post("/login", userLoginValidator(), validate, login);
 router.post("/refresh-access-token", refreshAccessToken);
 router.post("/reset-password/:token", isLoggedIn, resetPasswordValidator(), validate, resetForgottenPassword);
 router.post("/change-password", isLoggedIn, changePasswordValidator(), validate, changeCurrentPassword);
 
-router.get("/logout", isLoggedIn, logoutUser);
+router.get("/logout", isLoggedIn, logout);
 router.get("/verify/:token", verifyEmail);
 router.get("/forget-password", isLoggedIn, forgotPasswordRequest);
 router.get("/my-profile", isLoggedIn, getCurrentUser);

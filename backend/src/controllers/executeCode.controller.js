@@ -1,12 +1,11 @@
 import { db } from "../utils/db.js";
 import { submitBatch, getLanguage, pollBatchResults } from "../utils/judge0.js";
-import asyncHanlder from "../utils/asyncHandler.js"
+import {asyncHandler} from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js"
 
-export const executeCode = asyncHanlder(async (req, res) => {
-    const { source_code, languageId, stdin, expected_output } = req.body;
-    const { problemId } = req.params;
+export const executeCode = asyncHandler(async (req, res) => {
+    const { source_code, languageId, stdin, expected_output, problemId } = req.body;
     const userId = req.user.id;
 
     //validate test cases
@@ -31,8 +30,8 @@ export const executeCode = asyncHanlder(async (req, res) => {
     //Poll for results of all submitted test cases
     const results = await pollBatchResults(tokens);
 
-    // console.log("Result-------------");
-    // console.log(results);
+    console.log("Result-------------");
+    console.log(results);
 
     //Analyze test case results
     let allTestCasesPassed = true;
@@ -43,6 +42,13 @@ export const executeCode = asyncHanlder(async (req, res) => {
         const passed = expectedOutput === stdout;
 
         if (!passed) allTestCasesPassed = false;
+
+        console.log(`Testcase #${i+1}`);
+        console.log(`Input for testcase #${i+1}: ${stdin[i]}`)
+        console.log(`Expected Output for testcase #${i+1}: ${expected_output}`)
+        console.log(`Actual output for testcase #${i+1}: ${stdout}`)
+
+        console.log(`Matched testcase #${i+1}: ${passed}`)
 
         return {
             testCase: i + 1,
@@ -55,13 +61,6 @@ export const executeCode = asyncHanlder(async (req, res) => {
             memory: result.memory ? `${result.memory} KB` : undefined,
             time: result.time ? `${result.time} sec` : undefined
         }
-
-        // console.log(`Testcase #${i+1}`);
-        // console.log(`Input for testcase #${i+1}: ${stdin[i]}`)
-        // console.log(`Expected Output for testcase #${i+1}: ${expected_output}`)
-        // console.log(`Actual output for testcase #${i+1}: ${stdout}`)
-
-        // console.log(`Matched testcase #${i+1}: ${passed}`)
     });
 
     console.log(detailedResults);
@@ -71,7 +70,7 @@ export const executeCode = asyncHanlder(async (req, res) => {
         data: {
             userId,
             problemId,
-            source_code,
+            sourceCode: source_code,
             language: getLanguage(languageId),
             stdin: stdin.join('\n'),
             stdout: JSON.stringify(detailedResults.map(r => r.stdout)),
@@ -81,7 +80,7 @@ export const executeCode = asyncHanlder(async (req, res) => {
             compiledOutput: detailedResults.some(r => r.compiledOutput)
                 ? JSON.stringify(detailedResults.map(r => r.compiledOutput))
                 : null,
-            status: allPassed ? "Accepted" : "Wrong Answer",
+            status: allTestCasesPassed ? "Accepted" : "Wrong Answer",
             memory: detailedResults.some(r => r.memory)
                 ? JSON.stringify(detailedResults.map(r => r.memory))
                 : null,
@@ -95,8 +94,7 @@ export const executeCode = asyncHanlder(async (req, res) => {
     if (allTestCasesPassed) {
         await db.problemSolved.upsert({
             where: {
-                userId,
-                problemId
+                userId_problemId: { userId, problemId }
             },
             update: {},
             create: {
@@ -120,7 +118,7 @@ export const executeCode = asyncHanlder(async (req, res) => {
         time: result.time
     }));
 
-    await db.testCaseResult.creatMany({
+    await db.testCaseResult.createMany({
         data: testCaseResults,
     });
 
