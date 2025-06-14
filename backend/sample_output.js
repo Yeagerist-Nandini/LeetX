@@ -6,7 +6,7 @@ const [a, b] = input.split(' ').map(Number);
 console.log(a + b);
 
 
-let hala = {
+let submission = {
     "statusCode": 200,
     "data": {
         "id": "313ee53f-594b-4c93-bbd7-afe92d800574",
@@ -132,7 +132,7 @@ let get_all_submission = {
 }
 
 
-{
+let submission_by_project = {
     "statusCode": 200,
     "data": [
         {

@@ -21,7 +21,7 @@ app.use("/api/v1",healthCheckRouter);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/problems", problemRoutes);
 app.use("/api/v1/execute-code",executionRoutes);
-app.use("/api/v1/playlist", playlistRoutes);
+app.use("/api/v1/playlists", playlistRoutes);
 app.use("/api/v1/submissions", submissionRoutes);
 
 export default app;
