@@ -4,11 +4,35 @@ import { Link } from 'react-router-dom'
 import { z } from 'zod'
 import AuthImagePattern from '../components/AuthImagePattern';
 import { Code, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod';
 
+const LoginSchema = z.object({
+  email: z
+  .string()
+  .trim()
+  .email({message: "Enter a valid email"}),
+  password: z
+  .string()
+  .trim()
+  .min(1, {message: "Password is required"}),
+})
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState:{errors},
+  } = useForm({
+
+    resolver:zodResolver(LoginSchema)
+  });
+
+  const onSubmit = (data) => {
+     console.log(data);
+  }
 
   return (
     <div className='h-screen grid lg:grid-cols-2'>
@@ -28,7 +52,7 @@ const LoginPage = () => {
           </div>
 
           {/* Form */}
-          <form className='space-y-6'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
 
             {/* email */}
             <div className='flex flex-col gap-1'>
@@ -43,11 +67,15 @@ const LoginPage = () => {
 
                 <input
                   type="email"
-                  className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10`}
-                  name=""
+                  className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10 ${errors.email? "input-error": ""}`}
+                  {...register("email")}
                   placeholder='you@example.com'
                 />
               </div>
+
+              {errors.email && (
+                <p className='text-red-500 text-sm mt-1'>{errors.email.message}</p>
+              )}
             </div>
 
             {/* password */}
@@ -63,14 +91,16 @@ const LoginPage = () => {
 
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10`}
-                  name=""
+                  className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10 ${errors.password? "input-error": ""}`}
+                  {...register("password")}
                   placeholder='*******'
                 />
 
                 <button
                   type='button'
-                  className='absolute inset-y-0 right-0 pr-3 flex items-center hover:cursor-pointer'>
+                  className='absolute inset-y-0 right-0 pr-3 flex items-center hover:cursor-pointer'
+                  onClick={() => setShowPassword(!showPassword)}
+                >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-base-content/40 hover:text-gray-300" />
                   ) : (
@@ -79,6 +109,10 @@ const LoginPage = () => {
                 </button>
 
               </div>
+
+              {errors.password && (
+                <p className='text-red-500 text-sm mt-1'>{errors.password.message}</p>
+              )}
             </div>
 
             {/* submit button */}
@@ -99,7 +133,7 @@ const LoginPage = () => {
             <p className='text-base-content/60'>
               Don't have a account? {" "}
               <Link to='/signup' className='link link-primary'>
-                Sign in
+                Sign Up
               </Link>
             </p>
           </div>
@@ -110,7 +144,6 @@ const LoginPage = () => {
           title={"Welcome to our platform!"}
           subtitle={"Sign up to access our platform and start using our services."}
           />
-      {/* </div> */}
 
     </div>
   )
