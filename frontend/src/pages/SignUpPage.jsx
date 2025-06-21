@@ -13,6 +13,7 @@ import {
 
 import { z } from 'zod';
 import {zodResolver} from '@hookform/resolvers/zod'
+import { useAuthStore } from '../store/useAuthStore';
 
 const SignUpSchema = z.object({
   email: z
@@ -34,9 +35,12 @@ const SignUpSchema = z.object({
   .max(20, { message: "Name cannot exceed 20 characters"})
 })
 
+
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSigninUp, setIsSigninUp] = useState(false);
+  // const [isSigninUp, setIsSigninUp] = useState(false);
+
+  const {signup, isSigninUp} = useAuthStore();
 
   const {
     register,
@@ -46,8 +50,13 @@ const SignUpPage = () => {
     resolver:zodResolver(SignUpSchema)
   })
 
-  const onSubmit = (data) => {
+  const onSubmit = async(data) => {
     console.log(data);
+    try {
+      await signup(data);
+    } catch (error) {
+      console.error("Signup failed", error);
+    }
   }
 
   return (

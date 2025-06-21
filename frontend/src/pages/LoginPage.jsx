@@ -5,145 +5,154 @@ import { z } from 'zod'
 import AuthImagePattern from '../components/AuthImagePattern';
 import { Code, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuthStore } from '../store/useAuthStore';
 
 const LoginSchema = z.object({
   email: z
-  .string()
-  .trim()
-  .email({message: "Enter a valid email"}),
+    .string()
+    .trim()
+    .email({ message: "Enter a valid email" }),
   password: z
-  .string()
-  .trim()
-  .min(1, {message: "Password is required"}),
+    .string()
+    .trim()
+    .min(1, { message: "Password is required" }),
 })
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  // const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const { login, isLoggingIn } = useAuthStore();
 
   const {
     register,
     handleSubmit,
-    formState:{errors},
+    formState: { errors },
   } = useForm({
 
-    resolver:zodResolver(LoginSchema)
+    resolver: zodResolver(LoginSchema)
   });
 
-  const onSubmit = (data) => {
-     console.log(data);
+  const onSubmit = async (data) => {
+    console.log(data);
+
+    try {
+      await login(data);
+    } catch (error) {
+      console.error("Login failed", error);
+    }
   }
 
   return (
     <div className='h-screen grid lg:grid-cols-2'>
 
-        <div className='w-full max-w-md space-y-8 mt-10'>
+      <div className='w-full max-w-md space-y-8 mt-10'>
 
-          {/* Logo */}
-          <div className='text-center mb-8'>
-            <div className='flex flex-col items-center gap-2'>
-              <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center'>
-                <Code className='w-6 h-6 text-primary' />
-              </div>
-
-              <h1 className="text-2xl font-bold mt-2">Welcome</h1>
-              <p className="text-base-content/60">Login to your account</p>
+        {/* Logo */}
+        <div className='text-center mb-8'>
+          <div className='flex flex-col items-center gap-2'>
+            <div className='w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center'>
+              <Code className='w-6 h-6 text-primary' />
             </div>
+
+            <h1 className="text-2xl font-bold mt-2">Welcome</h1>
+            <p className="text-base-content/60">Login to your account</p>
           </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-
-            {/* email */}
-            <div className='flex flex-col gap-1'>
-              <label className='label'>
-                <span className='label-text font-medium'>Email</span>
-              </label>
-
-              <div className='relative'>
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-base-content/40" />
-                </div>
-
-                <input
-                  type="email"
-                  className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10 ${errors.email? "input-error": ""}`}
-                  {...register("email")}
-                  placeholder='you@example.com'
-                />
-              </div>
-
-              {errors.email && (
-                <p className='text-red-500 text-sm mt-1'>{errors.email.message}</p>
-              )}
-            </div>
-
-            {/* password */}
-            <div className='flex flex-col gap-1'>
-              <label className='label'>
-                <span className='label-text font-medium'>Password</span>
-              </label>
-
-              <div className='relative'>
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-base-content/40" />
-                </div>
-
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10 ${errors.password? "input-error": ""}`}
-                  {...register("password")}
-                  placeholder='*******'
-                />
-
-                <button
-                  type='button'
-                  className='absolute inset-y-0 right-0 pr-3 flex items-center hover:cursor-pointer'
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-base-content/40 hover:text-gray-300" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-base-content/40 hover:text-gray-300" />
-                  )}
-                </button>
-
-              </div>
-
-              {errors.password && (
-                <p className='text-red-500 text-sm mt-1'>{errors.password.message}</p>
-              )}
-            </div>
-
-            {/* submit button */}
-            <button type='submit' className='btn btn-primary w-full' disabled={isLoggingIn}>
-              {isLoggingIn ? (
-                <>
-                  <Loader2 className='h-5 w-5 animate-spin' />
-                  Loading...
-                </>
-              ) : (
-                "Log in"
-              )}
-            </button>
-          </form>
-
-          {/* Footer */}
-          <div className='text-center'>
-            <p className='text-base-content/60'>
-              Don't have a account? {" "}
-              <Link to='/signup' className='link link-primary'>
-                Sign Up
-              </Link>
-            </p>
-          </div>
-
         </div>
 
-          <AuthImagePattern
-          title={"Welcome to our platform!"}
-          subtitle={"Sign up to access our platform and start using our services."}
-          />
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+
+          {/* email */}
+          <div className='flex flex-col gap-1'>
+            <label className='label'>
+              <span className='label-text font-medium'>Email</span>
+            </label>
+
+            <div className='relative'>
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-base-content/40" />
+              </div>
+
+              <input
+                type="email"
+                className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10 ${errors.email ? "input-error" : ""}`}
+                {...register("email")}
+                placeholder='you@example.com'
+              />
+            </div>
+
+            {errors.email && (
+              <p className='text-red-500 text-sm mt-1'>{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* password */}
+          <div className='flex flex-col gap-1'>
+            <label className='label'>
+              <span className='label-text font-medium'>Password</span>
+            </label>
+
+            <div className='relative'>
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-base-content/40" />
+              </div>
+
+              <input
+                type={showPassword ? "text" : "password"}
+                className={`border text-sm bg-primary/10 rounded-sm p-2 w-full pl-10 ${errors.password ? "input-error" : ""}`}
+                {...register("password")}
+                placeholder='*******'
+              />
+
+              <button
+                type='button'
+                className='absolute inset-y-0 right-0 pr-3 flex items-center hover:cursor-pointer'
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-base-content/40 hover:text-gray-300" />
+                ) : (
+                  <Eye className="h-5 w-5 text-base-content/40 hover:text-gray-300" />
+                )}
+              </button>
+
+            </div>
+
+            {errors.password && (
+              <p className='text-red-500 text-sm mt-1'>{errors.password.message}</p>
+            )}
+          </div>
+
+          {/* submit button */}
+          <button type='submit' className='btn btn-primary w-full' disabled={isLoggingIn}>
+            {isLoggingIn ? (
+              <>
+                <Loader2 className='h-5 w-5 animate-spin' />
+                Loading...
+              </>
+            ) : (
+              "Log in"
+            )}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div className='text-center'>
+          <p className='text-base-content/60'>
+            Don't have a account? {" "}
+            <Link to='/signup' className='link link-primary'>
+              Sign Up
+            </Link>
+          </p>
+        </div>
+
+      </div>
+
+      <AuthImagePattern
+        title={"Welcome to our platform!"}
+        subtitle={"Sign up to access our platform and start using our services."}
+      />
 
     </div>
   )

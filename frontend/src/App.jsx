@@ -9,7 +9,7 @@ import AddProblem from "./pages/AddProblem";
 import ProblemPage from "./pages/ProblemPage";
 
 function App() {
-  const authUser = false;
+  const authUser = true;
 
   return (
     <div className="flex flex-col items-center justify-start ">
