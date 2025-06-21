@@ -1,9 +1,31 @@
 import React from 'react'
 
 const HomePage = () => {
+  const problems = [];
+
   return (
-    <div>HomePage</div> 
+    <div className="h-full flex flex-col items-center mt-14 px-4">
+      <div></div>
+      <h1 className="text-4xl font-extrabold text-center">
+        Welcome to <span className="text-primary">LeetX</span>
+      </h1>
+
+      <p className="mt-4 text-center text-lg font-semibold text-gray-500 dark:text-gray-400">
+        A Platform Inspired by Leetcode which helps you to prepare for coding
+        interviews and helps you to improve your coding skills by solving coding
+        problems
+      </p>
+
+      {
+        problems.length  > 0 ? <></> : (
+          <p className="mt-10 text-center text-lg font-semibold text-gray-500 dark:text-gray-400 z-10 border border-primary px-4 py-2 rounded-md border-dashed">
+            No problems found
+          </p>
+        )
+      }
+
+    </div>
   )
-} 
+}
 
 export default HomePage

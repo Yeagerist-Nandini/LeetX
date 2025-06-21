@@ -6,7 +6,7 @@ const AddProblem = () => {
     <div>
       <CreateProblemForm/>
     </div>
-  )
+  ) 
 }
 
 export default AddProblem

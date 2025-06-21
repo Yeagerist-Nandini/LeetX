@@ -7,12 +7,17 @@ import LoginPage from './pages/LoginPage.jsx';
 import SignUpPage from "./pages/SignUpPage";
 import AddProblem from "./pages/AddProblem";
 import ProblemPage from "./pages/ProblemPage";
+import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './store/useAuthStore.js';
 
 function App() {
   const authUser = true;
 
+  // const {authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
   return (
     <div className="flex flex-col items-center justify-start ">
+      <Toaster />
       <Routes>
         <Route path='/' element={<Layout />}>
           <Route index element={authUser ? <HomePage /> : <Navigate to={"/login"} />} />
