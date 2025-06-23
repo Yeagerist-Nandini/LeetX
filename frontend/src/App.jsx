@@ -9,6 +9,7 @@ import AddProblem from "./pages/AddProblem";
 import ProblemPage from "./pages/ProblemPage";
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/useAuthStore.js';
+import AdminRoute from './layout/AdminRoute.jsx';
 
 function App() {
   const authUser = true;
@@ -29,7 +30,11 @@ function App() {
 
         <Route path='/problem/:id' element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />} />
 
-        <Route path='/add-problem' element={authUser ? <AddProblem /> : <Navigate to={"/login"} />} />
+
+        <Route element={<AdminRoute />}>
+          <Route path='/add-problem' element={authUser ? <AddProblem /> : <Navigate to={"/"} />} />
+
+        </Route>
 
       </Routes>
     </div>
