@@ -22,7 +22,7 @@ export const isLoggedIn = (req,res,next) => {
 
 export const isAdmin = async (req, res, next) => {
     try {
-        const {id} = req.body.user;
+        const {id} = req.user;
 
         const user = await db.user.findUnique({
             where: {id},

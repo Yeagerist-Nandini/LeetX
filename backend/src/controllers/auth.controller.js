@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import cryto from "crypto";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { db } from "../utils/db.js"
@@ -87,7 +87,7 @@ const register = asyncHandler(async (req, res) => {
     }
 
     //generate verification token 
-    const emailVerificationToken = cryto.randomBytes(32).toString('hex');
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
     const emailVerificationExpiry = new Date(Date.now() + (20 * 60 * 1000));
 
 
@@ -260,7 +260,7 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
     if (!user) throw new ApiError(404, "User not found");
 
     //generate reset password url
-    const token = cryto.randomBytes(32).toString("hex");
+    const token = crypto.randomBytes(32).toString("hex");
     const resetPasswordUrl = `${process.env.BASE_URL}:${process.env.PORT}/api/v1/reset-password/${token}`
 
     //save it in db
